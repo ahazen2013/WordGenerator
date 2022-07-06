@@ -1,40 +1,16 @@
 import random
 
-WORD_LIST = 'new_list.txt'
+WORD_LIST = 'Phonetic Word List.txt'
 BAN_LIST = ['.', '-', '/', '&', "'", '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 VOWELS = ['a', 'e', 'i', 'o', 'u']
-# initial word list from: https://github.com/dwyl/english-words/blob/master/words_alpha.txt
-
-
-# class variables include the letter that an instance represents,
-# and the frequency with which each letter follows it
-class Letter:
-    key = ''
-
-    def __init__(self, k):
-        self.followers = {}
-        self.key = k
-
-    def add_follower(self, follower):
-        if follower in self.followers.keys():
-            self.followers[follower] += 1
-        else:
-            self.followers[follower] = 1
-
-    def __str__(self):
-        return self.key + ': ' + str(self.followers)
-
+# initial word list from: https://github.com/Alexir/CMUdict/blob/master/cmudict-0.7b
 
 # removes proper nouns, words containing numbers and symbols, and very long words from the data set
 def process_text(text):
     i = 0
     while i != len(text):
         word = text[i]
-        if '.' in word or '-' in word or "'" in word or '&' in word or '/' in word or\
-                '0' in word or '1' in word or '2' in word or '3' in word or '4' in word or\
-                '5' in word or '6' in word or '7' in word or '8' in word or '9' in word:
-            text.remove(word)
-        elif ord(word[0]) < 97:
+        if '.' in word or '-' in word or "'" in word or '&' in word or '/' in word:
             text.remove(word)
         elif len(word) > 10:
             text.remove(word)
@@ -48,21 +24,24 @@ def process_text(text):
 # lets is the list of Letters
 def frequency_analysis(text, lets) -> dict:
     letter_frequency = {}
-    for i in range(26):
-        letter_frequency[chr(97+i)] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     for word in text:
-        word = word.strip().lower()
-        for letter in range(len(word)):
+        word = word.split()[1:10]
+        for letter in range(0, len(word)):
+            if word[letter] not in lets.keys():
+                lets[word[letter]] = {}
             if letter == 0:
                 pass
             else:
-                lets[ord(word[letter-1])-97].add_follower(word[letter])
+                if word[letter] not in lets[word[letter-1]].keys():
+                    lets[word[letter - 1]][word[letter]] = 0
+                lets[word[letter-1]][word[letter]] += 1
+            if word[letter] not in letter_frequency.keys():
+                letter_frequency[word[letter]] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             letter_frequency[word[letter]][letter] += 1
             letter_frequency[word[letter]][9] += 1
     return letter_frequency
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     obj = open(WORD_LIST)
     words = obj.readlines()
@@ -75,9 +54,7 @@ if __name__ == '__main__':
     # words = fp.readlines()
     # fp.close()
 
-    letters = []
-    for i in range(26):
-        letters.append(Letter(chr(97+i)))
+    letters = {}
 
     letter_frequency = frequency_analysis(words, letters)
     letter_totals = [0, 0]
@@ -92,16 +69,16 @@ if __name__ == '__main__':
 
     retur = []
     for p in range(10):
-        ret = ''
+        ret = []
         for i in range(random.randint(4, 7)):
             if i == 0:
                 number = random.randint(1, letter_totals[i])
                 for j in letter_frequency.keys():
                     if number <= letter_frequency[j][i]:
-                        ret += j
+                        ret.append(j)
                         break
             else:
-                followers = letters[ord(ret[-1])-97].followers.copy()
+                followers = letters[ret[-1]].copy()
                 total = 0
                 for j in followers.keys():
                     followers[j] = followers[j] * letter_frequency[j][i]
@@ -111,8 +88,34 @@ if __name__ == '__main__':
                 for j in followers.keys():
                     total += followers[j]
                     if number <= total:
-                        ret += j
+                        ret.append(j)
                         break
         retur.append(ret)
     for i in retur:
         print(i)
+        r = ''
+        for j in i:
+            if len(j) > 2:
+                j = j[0:2]
+            if j == 'AA':
+                r += 'aw (odd) '
+            elif j == 'AE':
+                r += 'ah (at) '
+            elif j == 'AH':
+                r += 'uh (hut) '
+            elif j == 'AO':
+                r += 'oh (boat) '
+            elif j == 'AW':
+                r += 'ow (cow) '
+            elif j == 'AY':
+                r += 'eye (hide) '
+            elif j == 'DH':
+                r += 'th (thee) '
+            elif j == 'ER':
+                r += 'ur (hurt) '
+            elif j == 'IY':
+                r += 'ee (eat) '
+            else:
+                r += j.lower() + ' '
+        print(r)
+
