@@ -94,28 +94,40 @@ if __name__ == '__main__':
     for i in retur:
         print(i)
         r = ''
+        wor = ''
         for j in i:
             if len(j) > 2:
                 j = j[0:2]
             if j == 'AA':
                 r += 'aw (odd) '
+                wor += 'aw'
             elif j == 'AE':
                 r += 'ah (at) '
+                wor += 'ah'
             elif j == 'AH':
                 r += 'uh (hut) '
+                wor += 'uh'
             elif j == 'AO':
                 r += 'oh (boat) '
+                wor += 'oh'
             elif j == 'AW':
                 r += 'ow (cow) '
+                wor += 'ow'
             elif j == 'AY':
                 r += 'eye (hide) '
+                wor += 'ai'
             elif j == 'DH':
                 r += 'th (thee) '
+                wor += 'th'
             elif j == 'ER':
                 r += 'ur (hurt) '
+                wor += 'ur'
             elif j == 'IY':
                 r += 'ee (eat) '
+                wor += 'ee'
             else:
                 r += j.lower() + ' '
+                wor += j.lower()
         print(r)
+        print(wor + '\n')
 
